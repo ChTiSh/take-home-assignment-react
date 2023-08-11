@@ -1,73 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer base{
+  body{
+    @apply bg-bgGray
   }
-  a:hover {
-    color: #747bff;
+}
+
+@layer components{
+  .btn-primary{
+    @apply bg-purple text-white font-bold py-2 px-4 rounded shadow w-36 text-center
   }
-  button {
-    background-color: #f9f9f9;
+  .btn-primary:hover{
+    @apply bg-lighterPurple
+  }
+  .btn-secondary{
+    @apply bg-white text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow w-36 text-center
+  }
+  label, .textlink{
+    @apply text-sm font-SourcePro font-bold
+  }
+  input{
+    @apply w-full border-[1px] border-solid border-borderGray rounded-sm px-4 py-2 mt-4 mb-6 h-10 text-sm
   }
 }

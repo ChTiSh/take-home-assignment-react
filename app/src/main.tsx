@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import Login from './components/Login.tsx'
 
 
 
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
     {
       path:'/products',
       element: <ProductList />,
+    },
+    {
+      path:'/login',
+      element: <Login />,
     }
   ]);
 

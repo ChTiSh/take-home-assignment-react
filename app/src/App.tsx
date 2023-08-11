@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import './App.css'
 import { useQuery, gql } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
 
 
 const GET_PRODUCTS = gql`
@@ -26,17 +26,15 @@ const GET_USERS = gql`
 `;
 function App() {
     const [logIn, setLogIn] = useState(false)
+    const navigate = useNavigate();
     const openLogin = () => {
         setLogIn(!logIn);
+        navigate('/login')
     }
     return (
-        <>
-            <h1>Home Page</h1>
-            <div className="card">
-                <button onClick={openLogin}>Login</button>
-            </div>
-            <p className="read-the-docs">Sign in to view product list</p>
-        </>
+        <div className='bg-bgGray h-screen flex items-center justify-center'>
+            <button className="btn-primary w-1/8 mx-auto" onClick={openLogin}>Login</button>
+        </div>
     )
 }
 
