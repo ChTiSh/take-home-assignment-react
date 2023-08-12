@@ -1,7 +1,8 @@
 export default () => ({
     port: parseInt(process.env.PORT || '') || 8080,
     postgres: {
-        dsn: required('POSTGRES_DSN'),
+       //dsn: process.env.POSTGRES_DSN,
+       dsn: required('POSTGRES_DSN'),
     },
     env: {
         value: process.env.NODE_ENV,

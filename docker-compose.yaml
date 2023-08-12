@@ -8,6 +8,7 @@ services:
     volumes:
       - ./app/src:/app/src
       - ./app/public:/app/public
+      - /app/node_modules
     environment:
       CI: "true"
 

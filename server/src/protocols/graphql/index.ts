@@ -16,7 +16,7 @@ interface Options {
     stores: Stores
 }
 
-export const NewGraphQLServer = async ({ stores }: Options) => {
+const NewGraphQLServer = async ({ stores }: Options) => {
     const server = new ApolloServer({
         schema: makeSchema(),
         context: createContext({ stores }),
@@ -66,3 +66,5 @@ const createContext = ({ stores }: CreateContextInput): ContextFunction<ExpressC
         return context
     }
 }
+
+export default NewGraphQLServer;

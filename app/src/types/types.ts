@@ -5,10 +5,14 @@ export type Product = {
     
 }
 export type ProductProps = {
-    Product: Product; 
+    product: Product; 
 }
 
-
 export type ProductListProps = {
-    Products: Product[]; 
+    products: Product[]; 
+}
+
+export type SignInCredentials = {
+    email: string;
+    password: string;
 }

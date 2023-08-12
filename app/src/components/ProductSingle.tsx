@@ -1,4 +1,3 @@
-import React from "react";
 import { ProductProps } from "../types/types";
 
 const ProductSingle = ({ product }:ProductProps) => {

@@ -1,33 +1,55 @@
-
-import React, {useState} from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import judoLogo from '../../../design/Logo.png'
+import judoLogo from '../assets/Logo.png';
+import { gql, useMutation } from "@apollo/client";
+import {AUTH_TOKEN, REFRESH_TOKEN,EXPIRES_AT,USER_ID } from "../constants";
 
-interface LoginProps {
-    email:string; 
-    password:string;
-}
+const GET_TOKEN = gql`
+    mutation Mutation(
+        $email: String!, 
+        $password: String!
+    ) {
+        authenticate(email: $email, password: $password) {
+            accessToken
+            expiresAt
+            refreshToken
+        }
+    }
+`;
 
+//grab the user and verify if it's in teh database
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const [userIsVerified, setUserIsVerified] = useState(false);
-    const logInCredentials: LoginProps = {
-        email: email,
-        password:password
-    }
-    //still missing the credential verification logic
-
-    const handleSubmit = (): void =>{
-        //dispatch the info to the database
-        console.log(logInCredentials);
-        //if user credentials are verified
-        if(userIsVerified){
-            //navigate to the productlist page
-            navigate("/products")
+    const [login, { error }] = useMutation(GET_TOKEN,{
+        variables:{
+            email: email,
+            password: password
+        },
+        onCompleted: ({authenticate}) => {
+            console.log('in mutation')
+            localStorage.setItem(AUTH_TOKEN, authenticate.accessToken);
+            localStorage.setItem(EXPIRES_AT, authenticate.expiresAt);
+            localStorage.setItem(REFRESH_TOKEN, authenticate.refreshToken);
+            console.log(authenticate.accessToken, authenticate.expiresAt, authenticate.refreshToken)
+            setUserIsVerified(true);
+            
         }
-        
+    });
+    if (error) return <p>Error</p>;
+    // const signInCredentials: SignInCredentials = {
+    //     "email": "bob@example.com",
+    //     "password": "password",
+    // }
+
+    const handleSubmit = (e: { preventDefault: () => void; }): void =>{
+        e.preventDefault();
+        login()
+        if(userIsVerified){
+            navigate("/products");
+        }
     }
     return (
         <div className="h-screen flex flex-col items-center justify-center w-[466px] mx-auto">
@@ -39,12 +61,12 @@ const Login = () => {
                     <label>Email</label>
                     <input type="text" value={email} placeholder='andrea@judo.app'onChange={(e) => setEmail(e.target.value)}></input>
                     <label>Password</label>
-                    <input type="text" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
                     <button className="px-10 mx-auto hover:bg-lighterPurple rounded-sm w-full bg-purple font-SourcePro font-bold text-sm text-white leading-6 py-2 h-10" onClick={handleSubmit}>Sign in</button>
                     <a href='/'><p className="text-center textlink mt-8">Forgot password?</p></a>
                 </form>
             </div>
-            <div className="font-sourcePro text-sm text-center text-fontGray leading-6 tracking-normal mt-8">
+            <div className="whitespace-nowrap font-sourcePro text-sm text-center text-fontGray leading-6 tracking-normal mt-8 px-0">
                 <p>&copy;2001-2019 All Rights Reserved. Clip<sup>&reg;</sup> is a registered trademark of Rover labs.</p>
                 <p>Cookie Preferences, Privacy, and Terms.</p>
             </div>

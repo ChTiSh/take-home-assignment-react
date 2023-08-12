@@ -5,7 +5,7 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-stati
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "--"] 
 
-COPY package.json yarn.lock ./
+COPY package*.json yarn.lock ./
 RUN yarn install
 COPY . .
 

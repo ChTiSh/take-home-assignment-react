@@ -1,16 +1,12 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
 import App from './App.tsx'
 import ProductList from './components/ProductList.tsx'
 import './index.css'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
 
-import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import Login from './components/Login.tsx'
-
 
 
 const client = new ApolloClient({
