@@ -7,8 +7,8 @@ import Login from './components/Login.tsx'
 import App from './App.tsx'
 import ProductList from './components/ProductList.tsx'
 import './index.css'
-import { onError } from "@apollo/client/link/error";
-import { AUTH_TOKEN } from "./constants.ts";
+import { ErrorResponse, onError } from "@apollo/client/link/error";
+import { AUTH_TOKEN, REFRESH_TOKEN, EXPIRES_AT} from "./constants.ts";
 
 const httpLink = createHttpLink({
     uri: 'http://localhost:8080/graphql',
@@ -29,21 +29,45 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-const errorLink = onError(
-  ({ graphQLErrors, operation, forward }) => {
+const getNewToken = async () => {
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+  const accessToken = localStorage.getItem(AUTH_TOKEN);
+
+  const response = await fetch('/refresh', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ accessToken, refreshToken }),
+  });
+
+  if (!response.ok) {
+    console.log("Refresh token is invalid. Please log in again.");
+  }
+
+  const { accessToken: newAccessToken, expiresAt } = await response.json();
+
+  // Update the local storage with the new token and expiration time
+  localStorage.setItem(AUTH_TOKEN, newAccessToken);
+  localStorage.setItem(EXPIRES_AT, expiresAt);
+
+  return newAccessToken;
+};
+
+const errorLink = onError( 
+  async ({ graphQLErrors, operation, forward }: ErrorResponse) => {
     if (graphQLErrors) {
       for (const err of graphQLErrors) {
         switch (err.extensions.code) {
           // Apollo Server sets code to UNAUTHENTICATED
           // when an AuthenticationError is thrown in a resolver
-          case "UNAUTHENTICATED":{
-            // Modify the operation context with a new token
+          case "UNAUTHENTICATED": {
+            // Modify the operation context with the new token
             const oldHeaders = operation.getContext().headers;
-            const accessToken = localStorage.getItem(AUTH_TOKEN);
             operation.setContext({
               headers: {
                 ...oldHeaders,
-                authorization: accessToken ? `Bearer ${accessToken}` : "", 
+                authorization: `Bearer ${await getNewToken()}`
               },
             });
             // Retry the request, returning the new observable
@@ -52,12 +76,13 @@ const errorLink = onError(
         }
       }
     }
+    return forward(operation);
   }
 );
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  //link: from([httpLink, authLink, errorLink]),
-  link: authLink.concat(httpLink),
+  link: from([authLink,  httpLink, errorLink]),
+  //link: authLink.concat(httpLink),
 });
 
 const router = createBrowserRouter([

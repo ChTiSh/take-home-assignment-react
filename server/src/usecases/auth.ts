@@ -77,6 +77,7 @@ export const AuthenticateUser = ({ sessions, users }: AuthenticateUserStores) =>
         // Email and password has matched a user create a session
         const accessToken = generateToken()
         const refreshToken = generateToken()
+        //const expiresAt = new Date(Date.now() )
         const expiresAt = new Date(Date.now() + DAY)
 
         return await sessions.create({ accessToken, refreshToken, expiresAt, userID: user.id })
