@@ -6,6 +6,7 @@ import  NewGraphQLServer from './protocols/graphql'
 import { NewRestServer } from './protocols/rest'
 import { ProductsStore, SessionsStore, UsersStore } from './stores'
 import pg from 'pg'
+import cors from 'cors'
 
 const config = Config()
 const knex = Knex({
@@ -26,6 +27,7 @@ const stores = {
 }
 
 const app = Express()
+app.use(cors());
 
 app.disable('x-powered-by')
 

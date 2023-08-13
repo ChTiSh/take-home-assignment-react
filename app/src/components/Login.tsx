@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import judoLogo from '../assets/Logo.png';
+import judoLogo from '../assets/Logo@3x.png';
 import { gql, useMutation } from "@apollo/client";
-import {AUTH_TOKEN, REFRESH_TOKEN,EXPIRES_AT,USER_ID } from "../constants";
+import {AUTH_TOKEN, REFRESH_TOKEN,EXPIRES_AT } from "../constants";
+import { useApolloClient } from "@apollo/client";
 
 const GET_TOKEN = gql`
     mutation Mutation(
@@ -22,6 +23,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const client = useApolloClient();
     const [userIsVerified, setUserIsVerified] = useState(false);
     const [login, { error }] = useMutation(GET_TOKEN,{
         variables:{
@@ -35,9 +37,14 @@ const Login = () => {
             localStorage.setItem(REFRESH_TOKEN, authenticate.refreshToken);
             console.log(authenticate.accessToken, authenticate.expiresAt, authenticate.refreshToken)
             setUserIsVerified(true);
-            
+        },
+        context: {
+            headers: {
+                Authorization: localStorage.getItem(AUTH_TOKEN),
+            }
         }
     });
+
     if (error) return <p>Error</p>;
     // const signInCredentials: SignInCredentials = {
     //     "email": "bob@example.com",
@@ -46,15 +53,15 @@ const Login = () => {
 
     const handleSubmit = (e: { preventDefault: () => void; }): void =>{
         e.preventDefault();
-        login()
-        if(userIsVerified){
+        login();
+        if(localStorage.getItem(AUTH_TOKEN)){
             navigate("/products");
         }
     }
     return (
         <div className="h-screen flex flex-col items-center justify-center w-[466px] mx-auto">
             <div className="flex-col shadow-[0_0_6px_0px_rgba(0,0,0,0.20)] bg-white text-start p-[56px] rounded-[10px]">
-                <img src={judoLogo} className="w-[143px] h-[24px]" alt="judoLogo"/>
+                <img src={judoLogo} className="w-[143px]" alt="judoLogo"/>
                 
                 <h2 className="font-sourcePro font-semibold leading-10 text-black text-[30px] mt-10 mb-8">Sign in</h2>
                 <form className="w-full">

@@ -2,10 +2,10 @@ import { ForbiddenError } from 'apollo-server-express'
 import { rule, shield } from 'graphql-shield'
 
 const isAuthenticated = rule({ cache: 'contextual' })(async (parent, args, context) => {
-    return !!context.session
+    return !!context.session;
 })
 
-export default shield(
+const permissions = shield(
     {
         Query: {
             user: isAuthenticated,
@@ -18,3 +18,4 @@ export default shield(
         allowExternalErrors: true,
     }
 )
+export default permissions

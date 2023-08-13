@@ -11,7 +11,10 @@ const resolvers = {
             return await usecases.users.GetUser(stores, session)(id)
         },
         products: async (_source, _input, { stores }) => {
-            return await usecases.products.ListProducts(stores)()
+            console.log("Products resolver called!");
+            const products = await usecases.products.ListProducts(stores)();
+            console.log("Products:", products);
+            return products;
         },
     },
     Mutation: {

@@ -11,6 +11,7 @@ interface AuthenticateSessionStores {
 export const AuthenticateSession = ({ sessions }: AuthenticateSessionStores) => {
     return async (accessToken: string) => {
         const session = await sessions.findByAccessToken(accessToken)
+        console.log(session);
         if (!session) {
             throw new UnauthenticatedError()
         }

@@ -3,7 +3,7 @@ scalar DateTime
 type Query {
     # Protected query.
     user(id: ID!): User
-    # Producted query.
+    # Protected query.
     products: [Product!]!
 }
 

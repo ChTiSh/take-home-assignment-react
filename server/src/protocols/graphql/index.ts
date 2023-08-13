@@ -30,10 +30,15 @@ const NewGraphQLServer = async ({ stores }: Options) => {
 
 async function prepareSessionContext(req: Request, stores: Stores) {
     const authorization = req.headers.authorization
+    console.log(authorization);
     const match = authorization && authorization.match(/Bearer (.*)/)
+    console.log(match);
     if (match) {
         try {
-            return await usecases.auth.AuthenticateSession(stores)(match[1])
+            //return await usecases.auth.AuthenticateSession(stores)(match[1])
+            const session = await usecases.auth.AuthenticateSession(stores)(match[1]);
+            console.log("Authenticated session:", session);
+            return session;
         } catch (err) {
             if (err instanceof SessionExpiredError || err instanceof UnauthenticatedError) {
                 throw new ApolloError(err.message, err.code)
@@ -61,8 +66,7 @@ const createContext = ({ stores }: CreateContextInput): ContextFunction<ExpressC
         if (req) {
             const session = await prepareSessionContext(req, stores)
             context.session = session
-        }
-
+        }   
         return context
     }
 }

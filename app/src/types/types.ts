@@ -1,8 +1,9 @@
 export type Product = {
+    id: number;
     title: string;
     description: string;
     price: number;
-    
+    currency: string;
 }
 export type ProductProps = {
     product: Product; 

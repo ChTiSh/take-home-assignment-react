@@ -56,6 +56,7 @@ class SessionsStore {
 
     async findByAccessToken(token: string): Promise<Session | undefined> {
         const row = await this.knex<Row>(TABLE_NAME).where({ access_token: token }).first()
+        console.log(row);
         return row && this.toDomain(row)
     }
 
