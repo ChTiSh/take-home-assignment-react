@@ -1,11 +1,10 @@
 import { Product } from "../types/types";
 import ProductSingle from "./ProductSingle";
-import { useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import { gql } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {AUTH_TOKEN, REFRESH_TOKEN,EXPIRES_AT } from "../constants";
 import { useApolloClient } from "@apollo/client";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 //grabbing the productlist from the dummy data
 const GET_PRODUCTS = gql`
@@ -20,8 +19,19 @@ const GET_PRODUCTS = gql`
     }
 `;
 
+const GET_NEW_TOKEN = gql`
+mutation Mutation($accessToken: String!, $refreshToken: String!) {
+  refreshSession(accessToken: $accessToken, refreshToken: $refreshToken) {
+    refreshToken
+    expiresAt
+    accessToken
+  }
+}
+`
+
 const ProductList = () => {    
     const navigate = useNavigate();
+    const [expired, setExpired] = useState(false);
     const {loading, error, data, refetch} = useQuery(GET_PRODUCTS,{
         onCompleted: () => {
             console.log('in query')
@@ -33,14 +43,33 @@ const ProductList = () => {
           // If an error occurs, refetch the data
           refetch();
         }
-    }, [error, refetch]);
+    });
+
+    const [getNewToken] = useMutation(GET_NEW_TOKEN,{
+        variables:{
+          accessToken: localStorage.getItem(AUTH_TOKEN),
+          refreshToken: localStorage.getItem(REFRESH_TOKEN)
+        },
+        onCompleted: ({refreshSession}) => {
+          console.log('in getting new token')
+          localStorage.setItem(AUTH_TOKEN, refreshSession.accessToken);
+          localStorage.setItem(EXPIRES_AT, refreshSession.expiresAt);
+          localStorage.setItem(REFRESH_TOKEN, refreshSession.refreshToken);
+          console.log(refreshSession.accessToken, refreshSession.expiresAt, refreshSession.refreshToken)
+        }
+    });
     console.log(localStorage.getItem(AUTH_TOKEN));
     const client = useApolloClient();
     console.log(data);
     console.log('Error fetching products:', error?.message);
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error</p>;
-    
+
+    const sessionExpiryTime = localStorage.getItem("sessionExpiryTime");
+    if (sessionExpiryTime && Date.now() >= new Date(sessionExpiryTime).getTime()) {
+        getNewToken()
+    }
+
     const handleLogOut = (e: { preventDefault: () => void; }): void =>{
         e.preventDefault();
         localStorage.removeItem(AUTH_TOKEN);

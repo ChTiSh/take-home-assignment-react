@@ -24,7 +24,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const client = useApolloClient();
-    const [userIsVerified, setUserIsVerified] = useState(false);
+    //const [userIsVerified, setUserIsVerified] = useState(false);
     const [login, { error }] = useMutation(GET_TOKEN,{
         variables:{
             email: email,
@@ -36,7 +36,8 @@ const Login = () => {
             localStorage.setItem(EXPIRES_AT, authenticate.expiresAt);
             localStorage.setItem(REFRESH_TOKEN, authenticate.refreshToken);
             console.log(authenticate.accessToken, authenticate.expiresAt, authenticate.refreshToken)
-            setUserIsVerified(true);
+            //setUserIsVerified(true);
+            navigate("/products");
         },
         context: {
             headers: {
@@ -53,10 +54,8 @@ const Login = () => {
 
     const handleSubmit = (e: { preventDefault: () => void; }): void =>{
         e.preventDefault();
+        client.clearStore();
         login();
-        if(localStorage.getItem(AUTH_TOKEN)){
-            navigate("/products");
-        }
     }
     return (
         <div className="h-screen flex flex-col items-center justify-center w-[466px] mx-auto">

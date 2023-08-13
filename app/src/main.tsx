@@ -5,11 +5,10 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink, from} from
 import { setContext } from '@apollo/client/link/context';
 import Login from './components/Login.tsx'
 import App from './App.tsx'
-import { AUTH_TOKEN } from "./constants.ts";
 import ProductList from './components/ProductList.tsx'
 import './index.css'
 import { onError } from "@apollo/client/link/error";
-
+import { AUTH_TOKEN } from "./constants.ts";
 
 const httpLink = createHttpLink({
     uri: 'http://localhost:8080/graphql',
@@ -31,7 +30,7 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const errorLink = onError(
-  ({ graphQLErrors, networkError, operation, forward }) => {
+  ({ graphQLErrors, operation, forward }) => {
     if (graphQLErrors) {
       for (const err of graphQLErrors) {
         switch (err.extensions.code) {
@@ -40,10 +39,11 @@ const errorLink = onError(
           case "UNAUTHENTICATED":{
             // Modify the operation context with a new token
             const oldHeaders = operation.getContext().headers;
+            const accessToken = localStorage.getItem(AUTH_TOKEN);
             operation.setContext({
               headers: {
                 ...oldHeaders,
-                authorization: getNewToken(),
+                authorization: accessToken ? `Bearer ${accessToken}` : "", 
               },
             });
             // Retry the request, returning the new observable
@@ -52,17 +52,12 @@ const errorLink = onError(
         }
       }
     }
-  
-    // To retry on network errors, we recommend the RetryLink
-    // instead of the onError link. This just logs the error.
-    if (networkError) {
-      console.log(`[Network error]: ${networkError}`);
-    }
   }
 );
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: from([httpLink, authLink, errorLink]),
+  //link: from([httpLink, authLink, errorLink]),
+  link: authLink.concat(httpLink),
 });
 
 const router = createBrowserRouter([
